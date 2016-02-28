@@ -42,7 +42,7 @@ def abs(x):
 ##################  Your Code Here  #####################
 
 # a matrix of integer variable with size of 2*n
-X = [ [ Int(" x % s %s" % (i+1, j+1)) for j in range (2) ] for i in range (n) ]
+X = [ [ Int(" x_%s_%s" % (i+1, j+1)) for j in range (2) ] for i in range (n) ]
 
 # each column has to be disctinct as 0,1
 col_c= [ Distinct([ X[i][j] for i in range (n) ]) for j in range (2) ]
