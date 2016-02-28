@@ -22,7 +22,7 @@ s = int(sys.argv[2])
 ##################  Your Code Here  #####################
 
 # a matrix of integer variable with size of dim*dim
-X = [ [ Int(" x % s %s" % (i+1, j+1)) for j in range (dim) ] for i in range (dim) ]
+X = [ [ Int(" x_%s_%s" % (i+1, j+1)) for j in range (dim) ] for i in range (dim) ]
 
 #each cell contains a value in range 1 to dim^2
 cells_c = [ And (1 <= X[i][j], X[i][j] < s) 
