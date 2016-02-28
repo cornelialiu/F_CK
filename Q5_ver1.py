@@ -70,25 +70,25 @@ isSAT = solver.check()
 # print the result
 resultA = "Player A: "
 if isSAT == sat:
-	resultA += "The domainant strategy is "
-   	# evaluate the final array from the model, and re-map the guest id's to the result
-   	m = solver.model()   
-   	r = [ [ m. evaluate (X_A[i][j]) for j in range (3) ]for i in range (3) ]
+  resultA += "The domainant strategy is "
+  # evaluate the final array from the model, and re-map the guest id's to the result
+  m = solver.model()
+  r = [ [ m.evaluate(X_A[i][j]) for j in range (3) ]for i in range (3) ]
   ######################################################################################### NEED FIX
   # sum of r[i][:] is not returning a int but a formula
   # I guess it was because r[i][0] is not a list but a z3 object
   # need to read z3 functions to find a way either:
   # transform that to list
   # sum that element
-   	for i in range(3):
-   		if sum(r[i][:]) >= 2:
-   			resultA += levelList[i]
-   			break
+  for i in range(3):
+    if sum(r[i][:]) >= 2:
+   		resultA += levelList[i]
+   		break
    	##############  Complete the Output  #################
-   	print resultA
+  print resultA
 else:
-   	resultA += "no domainant strategy"
-   	print resultA
+  resultA += "no domainant strategy"
+  print resultA
 ########################################## The player winning matrix for A#################
 #matrix A = 
 #[[1, 1, 1], #high
@@ -108,22 +108,22 @@ isSAT = solver.check()
 resultB = "Player B: "
 
 if isSAT == sat:
-	resultB += "The domainant strategy is "
-   	# evaluate the final array from the model, and re-map the guest id's to the result
-   	m = solver.model()   
-   	r = [ [ m. evaluate (X_A[i][j]) for j in range (3) ]for i in range (3) ]
-   	########################################################################################### Need Fix
-   	#same problem as A
-   	for j in range(3):
-   		if sum(list(r[j][0:])) >= 2:
-   			buf = sum(r[j][0:])
-   			resultB += levelList[j]
-   			break
-   	##############  Complete the Output  #################
-   	print resultB
+  resultB += "The domainant strategy is "
+  # evaluate the final array from the model, and re-map the guest id's to the result
+  m = solver.model()
+  r = [ [ m.evaluate(X_A[i][j]) for j in range (3) ]for i in range (3) ]
+  ########################################################################################### Need Fix
+  #same problem as A
+  for j in range(3):
+    if sum(list(r[j][0:])) >= 2:
+      buf = sum(r[j][0:])
+      resultB += levelList[j]
+      break
+      ##############  Complete the Output  ################
+  print resultB
 else:
-   	resultB += "no domainant strategy"
-   	print resultB
+  resultB += "no domainant strategy"
+  print resultB
 
 ################################################The player winning matrix for B###########################
 # matrix B
