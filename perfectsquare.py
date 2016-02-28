@@ -23,7 +23,7 @@ a = Int('a')
 ##################  Your Code Here  #####################
 
 # The final formula going in. Change this to your actual formula
-F = a*a == x
+F = (a > 0, a*a == x)
 
 #########################################################
 #         Call the solver and print the answer          #
