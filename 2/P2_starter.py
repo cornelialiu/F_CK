@@ -1,6 +1,6 @@
 import sys
 
-# This code is meant to read in a list of moves for a rubik's cube and generate NuSMV code that solves the cube. 
+# This code is meant to read in a list of moves for a rubik's cube and generate code that solves the cube. 
 
 # To minimize the number of moves, only a surface panel can be turned, and only right.
 # So no rotation of central panels, and no left turns. Both achievable from right
