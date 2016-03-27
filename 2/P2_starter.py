@@ -185,7 +185,7 @@ def play(move_list):
 # play the input moves
 play(moves)
 
-# ------- create the NuSMV code ----------- #
+# ------- create the code ----------- #
 
 linebreak = lambda a,b: a+"\n"+b
 instance = cube

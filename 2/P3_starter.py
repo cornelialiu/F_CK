@@ -8,7 +8,7 @@ if len(sys.argv) != 2:
 # get the starting number of bricks
 bricks = int(sys.argv[1])
 
-# ------- create the NuSMV code ----------- #
+# ------- create the  code ----------- #
 
 linebreak = lambda a,b: a+"\n"+b
 
