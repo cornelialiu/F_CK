@@ -194,19 +194,18 @@ instance = cube
 # module declaration and variable declaration
 main = """MODULE main
 VAR
-    tiles : array 0..{0} of array 0..{0} of array 0..{1};
-ASSIGN""".format(n-1, 6)
+    tiles : array 0..{0} of array 0..{0} of array 0..5;
+ASSIGN""".format(n-1)
 
 # the initialization of variables to the instance
-init = reduce(linebreak, ["    init(tiles[{0}][{1}][{2}]) = {3};".format(x,y,z, cube[x][y][z]) for x in range(6) for y in range(n) for z in range(n)])
+init = reduce(linebreak, ["    init(tiles[{0}][{1}][{2}]) := {3};".format(x,y,z, cube[x][y][z]) for x in range(6) for y in range(n) for z in range(n)])
     
-    #i means i-th column
-
+    #i means i-th index
     # ========= panel relationship tale =========
     #           index of the row to the right
     # panel    top      right    bottom    left    
     # 0        4[i][0]  5[i][0]  3[i][0]   1[i][2]   
-    # 1        4[2]     5[i][0]  0[0]      2[i][2]   
+    # 1        4[2][i]  5[i][0]  0[0]      2[i][2]   
     # 2        4[i][2]  5[i][0]  1[i][2]   3[i][2]   
     # 3        4[0]     5[i][0]  2[2]      0[i][2]   
     # 4        3[0]     1[0]     0[0]      2[0]      
@@ -214,21 +213,78 @@ init = reduce(linebreak, ["    init(tiles[{0}][{1}][{2}]) = {3};".format(x,y,z, 
     # ===========================================
     #     in the order of this shift:
     # top >> right >> bottom >> left >> top
-panel_0 = reduce(linebreak, [
-  "    next(tiles[4][{0}][0]) = tiles[5][{0}][0];]".format(i) for i in range(n),
-  "    next(tiles[5][{0}][0]) = tiles[3][{0}][0];]".format(i) for i in range(n),
-  "    next(tiles[3][{0}][0]) = tiles[1][{0}][0];]".format(i) for i in range(n),
-  "    next(tiles[1][{0}][0]) = tiles[4][{0}][0];]".format(i) for i in range(n)])
-# I'm not sure if SMV need a buffer. Most likely not.
-panel_1 = reduce(linebreak, [""])
-panel_2 = reduce(linebreak, [""])
-panel_3 = reduce(linebreak, [""])
-panel_4 = reduce(linebreak, [""])
-panel_5 = reduce(linebreak, [""])
-tiles = reduce(linebreak, [panel_0, panel_1, panel_2, panel_3, panel_4, panel_5])
 
-spec = "" #TODO
+    # I'm not sure if SMV need a buffer. Most likely not.
+def edit_tail(condition, tail, changeTo):
+  '''
+  helper function to change tail character in parsed condition 
+  eg. 
+  "    next(tiles[1][1][2]) := tiles[4][1][0] &" 
+  =>"    next(tiles[1][1][2]) := tiles[4][1][0] ,"
+
+  '''
+  condition = condition[:-1]
+  condition += changeTo
+  return condition
+
+# if rotate panel 0
+panel_0_top = reduce(linebreak, ["    next(tiles[4][{0}][0]) := tiles[5][{0}][0] &".format(a) for a in range(n)])
+panel_0_right =reduce(linebreak, ["    next(tiles[5][{0}][0]) := tiles[3][{0}][0] &".format(i) for i in range(n)])
+panel_0_bottom = reduce(linebreak, ["    next(tiles[3][{0}][0]) := tiles[1][{0}][2] &".format(i) for i in range(n)])
+#last one can't be done by reduce a for loop because it's not same format. ; at the last one not &
+panel_0_left = reduce(linebreak, ["    next(tiles[1][{0}][2]) := tiles[4][{0}][0] &".format(i) for i in range(n)])
+panel_0_left = edit_tail(panel_0_left, "&","|")
+panel_0 = reduce(linebreak, [panel_0_top, panel_0_right, panel_0_bottom, panel_0_left])
+
+
+# if rotate panel 1
+panel_1_top = reduce(linebreak, ["    next(tiles[4][2][{0}]) := tiles[5][{0}][0] &".format(a) for a in range(n)])
+panel_1_right =reduce(linebreak, ["    next(tiles[5][{0}][0]) := tiles[0][0][{0}] &".format(i) for i in range(n)])
+panel_1_bottom = reduce(linebreak, ["    next(tiles[0][0][{0}]) := tiles[2][{0}][2] &".format(i) for i in range(n)])
+panel_1_left = reduce(linebreak, ["    next(tiles[2][{0}][2]) := tiles[4][2][{0}] &".format(i) for i in range(n)])
+panel_1_left = edit_tail(panel_1_left, "&","|")
+panel_1 = reduce(linebreak, [panel_1_top, panel_1_right, panel_1_bottom, panel_1_left])
+
+# if rotate panel 2
+panel_2_top = reduce(linebreak, ["    next(tiles[4][{0}][2]) := tiles[5][{0}][0] &".format(a) for a in range(n)])
+panel_2_right =reduce(linebreak, ["    next(tiles[5][{0}][0]) := tiles[1][{0}][2] &".format(i) for i in range(n)])
+panel_2_bottom = reduce(linebreak, ["    next(tiles[1][{0}][2]) := tiles[3][{0}][2] &".format(i) for i in range(n)])
+panel_2_left = reduce(linebreak, ["    next(tiles[3][{0}][2]) := tiles[4][{0}][2] &".format(i) for i in range(n)])
+panel_2_left = edit_tail(panel_2_left, "&","|")
+panel_2 = reduce(linebreak, [panel_2_top, panel_2_right, panel_2_bottom, panel_2_left])
+
+# if rotate panel 3
+panel_3_top = reduce(linebreak, ["    next(tiles[4][0][{0}]) := tiles[5][{0}][0] &".format(a) for a in range(n)])
+panel_3_right =reduce(linebreak, ["    next(tiles[5][{0}][0]) := tiles[2][2][{0}] &".format(i) for i in range(n)])
+panel_3_bottom = reduce(linebreak, ["    next(tiles[2][2][{0}]) := tiles[0][{0}][2] &".format(i) for i in range(n)])
+panel_3_left = reduce(linebreak, ["    next(tiles[0][{0}][2]) := tiles[4][0][{0}] &".format(i) for i in range(n)])
+panel_3_left = edit_tail(panel_3_left, "&","|")
+panel_3 = reduce(linebreak, [panel_3_top, panel_3_right, panel_3_bottom, panel_3_left])
+
+# if rotate panel 4
+panel_4 = reduce(linebreak, [
+  "    next(tiles[3][0]) := tiles[1][0] &",
+  "    next(tiles[1][0]) := tiles[0][0] &",
+  "    next(tiles[0][0]) := tiles[2][0] &",
+  "    next(tiles[2][0]) := tiles[3][0] |"])
+
+# if rotate panel 5
+panel_5 = reduce(linebreak, [
+  "    next(tiles[1][2]) := tiles[3][2] &",
+  "    next(tiles[3][2]) := tiles[0][2] &",
+  "    next(tiles[0][2]) := tiles[2][2] &",
+  "    next(tiles[2][2]) := tiles[1][2] ;"])
+
+tiles = reduce(linebreak, [panel_0, panel_1, panel_2,panel_3,panel_4,panel_5]) 
+
+#define the solve condition
+cube_solved = reduce(linebreak, [
+  "        tiles[{0}][{1}][{2}]) = {0} &".format(x,y,z, cube[x][y][z]) for x in range(6) for y in range(n) for z in range(n)])
+cube_solved = edit_tail(cube_solved, "&", ";")
+define = reduce(linebreak, ["DEFINE",
+  "    solved := ", cube_solved])
+spec = "SPEC !EF solved" 
 
 # put it all together
-print reduce(linebreak, [main,init,tiles,spec])
+print reduce(linebreak, [main,init,tiles,define,spec])
 
