@@ -23,15 +23,32 @@ VAR
 ASSIGN""".format(bricks)
 
 #TODO the initialization of variables
-init = "" 
-
+init= reduce(linebreak, ["    init(bricks):= {0};".format(bricks),
+	"    init(turn):= TRUE;","    init(winner):= none;"])
 
 #TODO transitions
-next = ""
+next_bricks = reduce(linebreak, [
+	"    next(bricks):= case",
+	"        bricks - i - j > 0 : bricks - i - j;",
+	"        bricks - i - j <= 0 : 0;",
+	"        esac;"])
+# turn represents "it's player A's turn to take bricks"
+next_turn = reduce(linebreak, [
+	"    next(turn):= case", 
+	"        turn : FALSE;",
+	"        !turn : TRUE;", 
+	"        esac;"])
+next_winner = reduce(linebreak, [
+	"    next(winner):= case", 
+	"        turn=TRUE &  bricks=0 : a;",
+	"        turn=FALSE & bricks=0 : b;",
+	"        TRUE: winner;"
+	"        esac;"])
+next = reduce (linebreak, [next_turn, next_bricks, next_winner])
 
 
 #TODO the specifications 
-spec = ""
+spec = "SPEC AF (winner = a | winner = b)"
 
 # put it all together
 print reduce(linebreak, [main,init,next,spec])
