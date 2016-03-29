@@ -29,9 +29,13 @@ init= reduce(linebreak, ["    init(bricks):= {0};".format(bricks),
 #TODO transitions
 next_bricks = reduce(linebreak, [
 	"    next(bricks):= case",
-	"        bricks - i - j > 0 : bricks - i - j;",
-	"        bricks - i - j <= 0 : 0;",
+	"        turn & (bricks - j > 0) : bricks - j;",
+	"        turn & (bricks - j <= 0) : 0;",
+	"        !turn & (bricks - i  > 0) : bricks - i;",
+	"        !turn & (bricks - i <= 0) : 0;",
+	"        TRUE:bricks;",
 	"        esac;"])
+
 # turn represents "it's player A's turn to take bricks"
 next_turn = reduce(linebreak, [
 	"    next(turn):= case", 
@@ -42,13 +46,13 @@ next_winner = reduce(linebreak, [
 	"    next(winner):= case", 
 	"        turn=TRUE &  bricks=0 : a;",
 	"        turn=FALSE & bricks=0 : b;",
-	"        TRUE: winner;"
+	"        TRUE: winner;",
 	"        esac;"])
 next = reduce (linebreak, [next_turn, next_bricks, next_winner])
 
 
 #TODO the specifications 
-spec = "SPEC AF (winner = a | winner = b)"
+spec = "SPEC !AF (winner = a | winner = b)"
 
 # put it all together
 print reduce(linebreak, [main,init,next,spec])
