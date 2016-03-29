@@ -74,6 +74,7 @@ _in = open(sys.argv[1], "r")
 # read the list
 moves = eval(_in.readline())
 
+n = 3
 #the rubik's cube in its initial solved state. 
 cube = [[[ k for i in range(n)] for j in range(n)] for k in range(6)]
 
@@ -191,10 +192,40 @@ linebreak = lambda a,b: a+"\n"+b
 instance = cube
 
 # module declaration and variable declaration
-main = "" #TODO
+main = """MODULE main
+VAR
+    tiles : array 0..{0} of array 0..{0} of array 0..{1};
+ASSIGN""".format(n-1, 6)
 
 # the initialization of variables to the instance
-init = "" #TODO
+init = reduce(linebreak, ["    init(tiles[{0}][{1}][{2}]) = {3};".format(x,y,z, cube[x][y][z]) for x in range(6) for y in range(n) for z in range(n)])
+    
+    #i means i-th column
+
+    # ========= panel relationship tale =========
+    #           index of the row to the right
+    # panel    top      right    bottom    left    
+    # 0        4[i][0]  5[i][0]  3[i][0]   1[i][2]   
+    # 1        4[2]     5[i][0]  0[0]      2[i][2]   
+    # 2        4[i][2]  5[i][0]  1[i][2]   3[i][2]   
+    # 3        4[0]     5[i][0]  2[2]      0[i][2]   
+    # 4        3[0]     1[0]     0[0]      2[0]      
+    # 5        1[2]     3[2]     0[2]      2[2]      
+    # ===========================================
+    #     in the order of this shift:
+    # top >> right >> bottom >> left >> top
+panel_0 = reduce(linebreak, [
+  "    next(tiles[4][{0}][0]) = tiles[5][{0}][0];]".format(i) for i in range(n),
+  "    next(tiles[5][{0}][0]) = tiles[3][{0}][0];]".format(i) for i in range(n),
+  "    next(tiles[3][{0}][0]) = tiles[1][{0}][0];]".format(i) for i in range(n),
+  "    next(tiles[1][{0}][0]) = tiles[4][{0}][0];]".format(i) for i in range(n)])
+# I'm not sure if SMV need a buffer. Most likely not.
+panel_1 = reduce(linebreak, [""])
+panel_2 = reduce(linebreak, [""])
+panel_3 = reduce(linebreak, [""])
+panel_4 = reduce(linebreak, [""])
+panel_5 = reduce(linebreak, [""])
+tiles = reduce(linebreak, [panel_0, panel_1, panel_2, panel_3, panel_4, panel_5])
 
 spec = "" #TODO
 
